@@ -1,6 +1,8 @@
 package sec.portscanner;
 
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.UnknownHostException;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.Set;
@@ -36,8 +38,19 @@ public class PortScanner {
         Set<Integer> accessiblePorts = new TreeSet<>();
         start = Math.max(start, MIN_PORT);
         end = Math.min(end, MAX_PORT);
-
-
+        for (int port_a = start; port_a <= end; port_a++) {
+            try {
+                Socket socket = new Socket(address, port_a);
+                Scanner reader = new Scanner(socket.getInputStream());
+                // update accessiblePorts with Open port discovered
+                accessiblePorts.add(port_a);
+                socket.close ();
+                } catch (UnknownHostException ex) {  
+                    System.err.println(ex.getMessage());
+                } catch (IOException ex) {
+                  System.err.println("Port " + port_a + " is closed.");
+                }
+        }
         return accessiblePorts;
     }
 }
